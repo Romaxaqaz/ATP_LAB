@@ -1,0 +1,37 @@
+﻿<Window x:Class="ATP_Lab.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" 
+        xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+        xmlns:local2="clr-namespace:ATP_Lab.ViewModels"
+        xmlns:local="clr-namespace:ATP_Lab"
+        mc:Ignorable="d"
+        Title="TheWindow" Height="350" Width="525">
+    <Window.DataContext>
+            <local2:TreeViewModel/>
+    </Window.DataContext>
+    <StackPanel>
+        <TreeView Name="TheTreeView" ItemsSource="{Binding Path=Operation}"
+                  MouseDown="TreeView_MouseDown"
+              MouseMove="TreeView_MouseMove"
+              DragEnter="TheTreeView_CheckDropTarget"
+              DragLeave="TheTreeView_CheckDropTarget"
+              DragOver="TheTreeView_CheckDropTarget"
+              Drop="TheTreeView_Drop">
+            <TreeView.ItemContainerStyle>
+                <Style TargetType="{x:Type TreeViewItem}">
+                    <Setter Property="AllowDrop" Value="True" />
+                </Style>
+            </TreeView.ItemContainerStyle>
+            <TreeView.ItemTemplate>
+                <HierarchicalDataTemplate ItemsSource="{Binding Path=MoreOperation}">
+                    <TextBlock Text="{Binding Path=Name}" />
+                </HierarchicalDataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
+        <ComboBox Name="Combo" ItemsSource="{Binding OperationNameCollection}" SelectedIndex="1"/>
+        <Button Width="100" Height="30" Content="Добавить" HorizontalAlignment="Left" Command="{Binding AddOperationItemCommand}" CommandParameter="{Binding ElementName=Combo}"/>
+    </StackPanel>
+</Window>
