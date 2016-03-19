@@ -9,29 +9,178 @@
         xmlns:local="clr-namespace:ATP_Lab"
         mc:Ignorable="d"
         Title="TheWindow" Height="350" Width="525">
+    
     <Window.DataContext>
             <local2:TreeViewModel/>
     </Window.DataContext>
-    <StackPanel>
-        <TreeView Name="TheTreeView" ItemsSource="{Binding Path=Operation}"
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <StackPanel>
+            <Button Width="100" Height="10" HorizontalAlignment="Right" Command="{Binding OpenSettingCommand}"/>
+        </StackPanel>
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+            <TreeView Name="TheTreeView" ItemsSource="{Binding Path=Operation}"
                   MouseDown="TreeView_MouseDown"
               MouseMove="TreeView_MouseMove"
               DragEnter="TheTreeView_CheckDropTarget"
               DragLeave="TheTreeView_CheckDropTarget"
               DragOver="TheTreeView_CheckDropTarget"
               Drop="TheTreeView_Drop">
-            <TreeView.ItemContainerStyle>
-                <Style TargetType="{x:Type TreeViewItem}">
-                    <Setter Property="AllowDrop" Value="True" />
-                </Style>
-            </TreeView.ItemContainerStyle>
-            <TreeView.ItemTemplate>
-                <HierarchicalDataTemplate ItemsSource="{Binding Path=MoreOperation}">
-                    <TextBlock Text="{Binding Path=Name}" />
-                </HierarchicalDataTemplate>
-            </TreeView.ItemTemplate>
-        </TreeView>
-        <ComboBox Name="Combo" ItemsSource="{Binding OperationNameCollection}" SelectedIndex="1"/>
-        <Button Width="100" Height="30" Content="Добавить" HorizontalAlignment="Left" Command="{Binding AddOperationItemCommand}" CommandParameter="{Binding ElementName=Combo}"/>
-    </StackPanel>
+                <TreeView.ItemContainerStyle>
+                    <Style TargetType="{x:Type TreeViewItem}">
+                        <Setter Property="AllowDrop" Value="True" />
+                    </Style>
+
+                </TreeView.ItemContainerStyle>
+                <TreeView.ItemTemplate>
+                    <HierarchicalDataTemplate ItemsSource="{Binding Path=MoreOperation}">
+                        <TextBlock Text="{Binding Path=Name}">
+                            <TextBlock.ContextMenu>
+                                <ContextMenu>
+                                    <TextBlock Text="{Binding Name}" FontWeight="Bold"/>
+                                    <Separator/>
+                                    <MenuItem Header="Добавить операцию" 
+                                          Command="{Binding AddOperationChildrenItemCommand}"/>
+                                    <MenuItem Header="Удалить операцию"/>
+                                </ContextMenu>
+                            </TextBlock.ContextMenu>
+                    </TextBlock>
+                        <HierarchicalDataTemplate.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Margin="1" Foreground="Blue" Text="{Binding Name}">
+                                    <TextBlock.ContextMenu>
+                                        <ContextMenu>
+                                            <TextBlock Text="{Binding Name}" FontWeight="Bold"/>
+                                            <Separator/>
+                                            <MenuItem Header="Изменить"/>
+                                            <MenuItem Header="Удалить"/>
+                                        </ContextMenu>
+                                    </TextBlock.ContextMenu>
+                            </TextBlock>
+                            </DataTemplate>
+                        </HierarchicalDataTemplate.ItemTemplate>
+                    </HierarchicalDataTemplate>
+                </TreeView.ItemTemplate>
+            </TreeView>
+
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <GroupBox Header="Операция" Grid.Column="0" FontWeight="Bold">
+                    <StackPanel>
+                        <ComboBox Name="Combo" Width="100" FontWeight="Normal" HorizontalAlignment="Left" ItemsSource="{Binding OperationNameCollection}" SelectedIndex="{Binding SelectedMainOperationCombobox, Mode=TwoWay}" Margin="2"/>
+                        <Button  Content="Добавить" HorizontalAlignment="Stretch" FontWeight="Normal" Command="{Binding AddOperationItemCommand}" CommandParameter="{Binding ElementName=Combo}" Margin="5"/>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Header="Средства технологического оснащения" FontWeight="Bold" Grid.Column="1">
+                    <StackPanel>
+                        <TextBox x:Name="MeansOfTechnologicalEquipmentTextBox" FontWeight="Normal" Text="{Binding MeansOfTechnologicalEquipment, Mode=TwoWay}"/>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition Height="auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <GroupBox Header="Инструмент">
+                                <ComboBox ItemsSource="{Binding Instrument}" FontWeight="Normal" SelectedIndex="{Binding SelectedIndexInstrumentComboBox, Mode=TwoWay}"/>
+                            </GroupBox>
+                            <GroupBox Header="Оснастка" Grid.Column="1">
+                                <ComboBox ItemsSource="{Binding Equipment}" FontWeight="Normal" SelectedIndex="{Binding SelectedIndexeEuipmentComboBox, Mode=TwoWay}"/>
+                            </GroupBox>
+                            <GroupBox Header="Ср-ва контроля" Grid.Column="2">
+                                <ComboBox ItemsSource="{Binding Control}" FontWeight="Normal" SelectedIndex="{Binding SelectedIndexeControlComboBox, Mode=TwoWay}"/>
+                            </GroupBox>
+
+                            <StackPanel Grid.Row="1" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Right" >
+                                <Button Content="Добавить" 
+                                    Height="25" Width="100"
+                                    FontWeight="Normal" Margin="3"
+                                    Command="{Binding MeansOfTechnologicalEquipmentCommand}"/>
+                                <CheckBox Content="Подтвердить"
+                                      VerticalAlignment="Center"
+                                      Margin="5,0,0,0"
+                                      FontWeight="Normal"
+                                      IsChecked="{Binding MeansChoise, Mode=TwoWay}"/>
+                            </StackPanel>
+
+                        </Grid>
+                    </StackPanel>
+                </GroupBox>
+            </Grid>
+
+            <GroupBox Header="Переход" Grid.Row="2" FontWeight="Bold">
+                <StackPanel>
+                    <TextBox Text="{Binding ItransitionContent, Mode=TwoWay}" FontWeight="Normal"/>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
+                        <GroupBox Header="Действие">
+                            <ComboBox ItemsSource="{Binding Action}" FontWeight="Normal" SelectedIndex="{Binding SelectedActionControlComboBox,Mode=TwoWay}"/>
+                        </GroupBox>
+                        <GroupBox Header="Объект" Grid.Column="1">
+                            <ComboBox ItemsSource="{Binding ObjectAction}" FontWeight="Normal" SelectedIndex="{Binding SelectedObjectActionControlComboBox,Mode=TwoWay }"/>
+                        </GroupBox>
+                        <GroupBox Header="Идент." Grid.Column="2">
+                            <TextBox Width="30" Text="{Binding Identity}" FontWeight="Normal"/>
+                        </GroupBox>
+                        <GroupBox Header="Размер 1" Grid.Column="3">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Width="30" Text="{Binding SizeOne, Mode=TwoWay}" FontWeight="Normal"/>
+                                <TextBox Width="30" Text="{Binding SizeOneValue, Mode=TwoWay}" Margin="3,0,0,0" FontWeight="Normal"/>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Header="Размер 2" Grid.Column="4">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Width="30" Text="{Binding SizeTwo, Mode=TwoWay}" FontWeight="Normal"/>
+                                <TextBox Width="30" Text="{Binding SizeTwoValue, Mode=TwoWay}" Margin="3,0,0,0" FontWeight="Normal"/>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Header="Размер 3" Grid.Column="5">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Width="30" Text="{Binding SizeThree, Mode=TwoWay}" FontWeight="Normal"/>
+                                <TextBox Width="30" Text="{Binding SizeThreeValue, Mode=TwoWay}" Margin="3,0,0,0" FontWeight="Normal"/>
+                            </StackPanel>
+                        </GroupBox>
+                        <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="4" Grid.ColumnSpan="2">
+                            <Button Content="Добавить"
+                                Height="25" Width="100" Margin="3"
+                                FontWeight="Normal"
+                                Command="{Binding IransitionCommand}"/>
+                            <CheckBox Content="подвердить" 
+                                  VerticalAlignment="Center" Margin="5,0,0,0"
+                                  FontWeight="Normal"
+                                  IsChecked="{Binding TransitionChoise, Mode=TwoWay}"/>
+                        </StackPanel>
+
+                    </Grid>
+                </StackPanel>
+            </GroupBox>
+        </Grid>
+    </Grid>
+   
 </Window>
