@@ -8,7 +8,7 @@
         xmlns:local2="clr-namespace:ATP_Lab.ViewModels"
         xmlns:local="clr-namespace:ATP_Lab"
         mc:Ignorable="d"
-        Title="TheWindow" Height="350" Width="525">
+        Title="TheWindow" Height="500" Width="525">
     
     <Window.DataContext>
             <local2:TreeViewModel/>

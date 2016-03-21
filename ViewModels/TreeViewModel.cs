@@ -1,9 +1,11 @@
 ﻿using ATP_Lab.Command;
 using ATP_Lab.Model;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,11 +24,12 @@ namespace ATP_Lab.ViewModels
 
         #region Collections
         private ObservableCollection<string> operationNameCollection = new ObservableCollection<string>() { "Долбежная", "Отделочная", "Токарная", "Протяжная", "Сверлильная" };
-        private ObservableCollection<string> instrument = new ObservableCollection<string>() { "Долото", "Долбежный станок", "Отделка", "Отделка2", "Протяжка", "Протяжка", "Сверло", "Сверло", "Протяжка", "Протяжка" };
-        private ObservableCollection<string> equipment = new ObservableCollection<string>() { "Долото", "Долбежный станок", "Отделка", "Отделка2" };
-        private ObservableCollection<string> control = new ObservableCollection<string>() { "Долото", "Долбежный станок", "Отделка", "Отделка2" };
-        private ObservableCollection<string> action = new ObservableCollection<string>() { "Долото", "Долбежный станок", "Отделка", "Отделка2" };
-        private ObservableCollection<string> objectAction = new ObservableCollection<string>() { "Долото", "Долбежный станок", "Отделка", "Отделка2" };
+        private ObservableCollection<string> instrument;
+        private ObservableCollection<string> equipment;
+        private ObservableCollection<string> control;
+        private ObservableCollection<string> action;
+        private ObservableCollection<string> objectAction;
+        private ObservableCollection<AllCollectionModel> allCollection = new ObservableCollection<AllCollectionModel>();
         public ObservableCollection<string> OperationNameCollection
         {
             get
@@ -79,6 +82,13 @@ namespace ATP_Lab.ViewModels
             get
             {
                 return objectAction;
+            }
+        }
+        public ObservableCollection<AllCollectionModel> AllCollection
+        {
+            get
+            {
+                return allCollection;
             }
         }
         #endregion 
@@ -252,28 +262,22 @@ namespace ATP_Lab.ViewModels
 
         public TreeViewModel()
         {
-
-
             AddOperationItemCommand = new RelayCommand(Add, param => this.canExecute);
             addOperationChildrenItemCommand = new RelayCommand(AddChildrenOperation, param => this.canExecute);
             MeansOfTechnologicalEquipmentCommand = new RelayCommand(MeansOfTechnologicalEquipmentCreate, param => this.canExecute);
             IransitionCommand = new RelayCommand(ItransitionGenerate, param => this.canExecute);
             OpenSettingCommand = new RelayCommand(OpenSettingWindow, param => this.canExecute);
 
-            _Operation = new ObservableCollection<Operation>();
-            Operation source = new Operation("Операция 1");
-            _Operation.Add(source);
-            source.MoreOperation.Add(new Operation("Item 1"));
-            source.MoreOperation.Add(new Operation("Item 2"));
-            source.MoreOperation.Add(new Operation("Item 3"));
-            source.MoreOperation.Add(new Operation("Item 4"));
+            allCollection.Add(new AllCollectionModel("MainOperation", OperationNameCollection));
+            allCollection.Add(new AllCollectionModel("Equipment", Equipment));
+            allCollection.Add(new AllCollectionModel("Control", Control));
+            allCollection.Add(new AllCollectionModel("Action", Action));
+            allCollection.Add(new AllCollectionModel("ObjectAction", ObjectAction));
+            allCollection.Add(new AllCollectionModel("Instrument", Instrument));
 
-            Operation source2 = new Operation("Операция 2");
-            _Operation.Add(source2);
-            source2.MoreOperation.Add(new Operation("Item 1"));
-            source2.MoreOperation.Add(new Operation("Item 2"));
-            source2.MoreOperation.Add(new Operation("Item 3"));
-            source2.MoreOperation.Add(new Operation("Item 4"));
+            SetCollection();
+
+            _Operation = new ObservableCollection<Operation>();
         }
 
         private void OpenSettingWindow(object obj)
@@ -331,6 +335,42 @@ namespace ATP_Lab.ViewModels
                  SizeThree, SizeThreeValue
                  );
             return ItransitionContent;
+        }
+
+        private void SetCollection()
+        {
+            foreach (var item in AllCollection)
+            {
+                switch(item.Name)
+                {
+                    case "Instrument":
+                        instrument = ReturnCollectionOutFile(item.Name);
+                        break;
+                    case "Equipment":
+                        equipment = ReturnCollectionOutFile(item.Name);
+                        break;
+                    case "Control":
+                        control = ReturnCollectionOutFile(item.Name);
+                        break;
+                    case "Action":
+                        action = ReturnCollectionOutFile(item.Name);
+                        break;
+                    case "ObjectAction":
+                        objectAction = ReturnCollectionOutFile(item.Name);
+                        break;
+                }
+
+            }
+        }
+
+        private ObservableCollection<string> ReturnCollectionOutFile(string name)
+        {
+            string text = "";
+            using (StreamReader streamReader = new StreamReader(name + ".txt", Encoding.UTF8))
+            {
+                text = streamReader.ReadToEnd();
+            }
+           return JsonConvert.DeserializeObject<ObservableCollection<string>>(text);
         }
 
         /// <summary>

@@ -25,16 +25,18 @@ namespace ATP_Lab
     
     public partial class SettingPage : Window
     {
-
+        SettingViewModel view = new SettingViewModel();
         public SettingPage()
         {
-
-
+            InitializeComponent();
+            this.DataContext = view;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-          
         }
+
+
+
     }
 }
