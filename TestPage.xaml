@@ -1,0 +1,34 @@
+﻿<Window x:Class="ATP_Lab.TestPage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ATP_Lab"
+        xmlns:view="clr-namespace:ATP_Lab.ViewModels"
+        mc:Ignorable="d"
+        Title="TestPage" Height="300" Width="300">
+    <Window.DataContext>
+        <view:TestPageVM/>
+    </Window.DataContext>
+    <Grid>
+        <ListView x:Name="TestList" ItemsSource="{Binding Content}" Tag="MainListview" AllowDrop="True" PreviewMouseLeftButtonDown="dList_PreviewMouseLeftButtonDown" Drop="dList_Drop" MouseMove="TestList_MouseMove">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel>
+                        <Expander Header="{Binding Name}">
+                            <ListView x:Name="dList" Tag="{Binding Name}" ItemsSource="{Binding MoreName}" PreviewMouseLeftButtonDown="dList_PreviewMouseLeftButtonDown" Drop="dList_Drop" AllowDrop="True">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </Expander>
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </Grid>
+</Window>

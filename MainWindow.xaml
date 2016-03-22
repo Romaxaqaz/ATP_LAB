@@ -19,59 +19,52 @@
             <RowDefinition Height="auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <StackPanel>
-            <Button Width="100" Height="10" HorizontalAlignment="Right" Command="{Binding OpenSettingCommand}"/>
-        </StackPanel>
+        <Menu>
+            <MenuItem Header="Main">
+                <MenuItem Header="Setting" Command="{Binding OpenSettingCommand}"></MenuItem>
+                <Separator></Separator>
+                <MenuItem Header="Save" Command="{Binding SaveMainCollection}"></MenuItem>
+            </MenuItem>
+        </Menu>
+       
         <Grid Grid.Row="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
-            <TreeView Name="TheTreeView" ItemsSource="{Binding Path=Operation}"
-                  MouseDown="TreeView_MouseDown"
-              MouseMove="TreeView_MouseMove"
-              DragEnter="TheTreeView_CheckDropTarget"
-              DragLeave="TheTreeView_CheckDropTarget"
-              DragOver="TheTreeView_CheckDropTarget"
-              Drop="TheTreeView_Drop">
-                <TreeView.ItemContainerStyle>
-                    <Style TargetType="{x:Type TreeViewItem}">
-                        <Setter Property="AllowDrop" Value="True" />
-                    </Style>
-
-                </TreeView.ItemContainerStyle>
-                <TreeView.ItemTemplate>
-                    <HierarchicalDataTemplate ItemsSource="{Binding Path=MoreOperation}">
-                        <TextBlock Text="{Binding Path=Name}">
-                            <TextBlock.ContextMenu>
-                                <ContextMenu>
-                                    <TextBlock Text="{Binding Name}" FontWeight="Bold"/>
-                                    <Separator/>
-                                    <MenuItem Header="Добавить операцию" 
-                                          Command="{Binding AddOperationChildrenItemCommand}"/>
-                                    <MenuItem Header="Удалить операцию"/>
-                                </ContextMenu>
-                            </TextBlock.ContextMenu>
-                    </TextBlock>
-                        <HierarchicalDataTemplate.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Margin="1" Foreground="Blue" Text="{Binding Name}">
-                                    <TextBlock.ContextMenu>
-                                        <ContextMenu>
-                                            <TextBlock Text="{Binding Name}" FontWeight="Bold"/>
-                                            <Separator/>
-                                            <MenuItem Header="Изменить"/>
-                                            <MenuItem Header="Удалить"/>
-                                        </ContextMenu>
-                                    </TextBlock.ContextMenu>
-                            </TextBlock>
-                            </DataTemplate>
-                        </HierarchicalDataTemplate.ItemTemplate>
-                    </HierarchicalDataTemplate>
-                </TreeView.ItemTemplate>
-            </TreeView>
-
+            <ListView x:Name="TestList" ItemsSource="{Binding Operation}" Tag="MainListview" AllowDrop="True" PreviewMouseLeftButtonDown="dList_PreviewMouseLeftButtonDown" Drop="dList_Drop" MouseMove="TestList_MouseMove">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel>
+                            <Expander Header="{Binding Name}" HorizontalAlignment="Stretch">
+                                <ListView x:Name="dList"
+                                          Tag="{Binding Name}"
+                                          ItemsSource="{Binding MoreOperation}"
+                                          Margin="10,5,0,0" Width="{Binding ActualWidth}"
+                                          MaxHeight="200"
+                                          PreviewMouseLeftButtonDown="dList_PreviewMouseLeftButtonDown"
+                                          Drop="dList_Drop" AllowDrop="True">
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding Name}"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                    <ListView.ItemContainerStyle>
+                                        <Style TargetType="ListViewItem">
+                                            <Setter  Property="HorizontalAlignment" Value="Stretch" />
+                                            <Setter Property="Margin" Value="4"/>
+                                        </Style>
+                                    </ListView.ItemContainerStyle>
+                                </ListView>
+                            </Expander>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
@@ -81,6 +74,7 @@
                     <StackPanel>
                         <ComboBox Name="Combo" Width="100" FontWeight="Normal" HorizontalAlignment="Left" ItemsSource="{Binding OperationNameCollection}" SelectedIndex="{Binding SelectedMainOperationCombobox, Mode=TwoWay}" Margin="2"/>
                         <Button  Content="Добавить" HorizontalAlignment="Stretch" FontWeight="Normal" Command="{Binding AddOperationItemCommand}" CommandParameter="{Binding ElementName=Combo}" Margin="5"/>
+                        <ComboBox Name="NewOpearion" ItemsSource="{Binding NewOperationCollection, Mode=TwoWay}" SelectedIndex="{Binding SelectedIndexNewOperationComboBox, Mode=TwoWay}"/>
                     </StackPanel>
                 </GroupBox>
                 <GroupBox Header="Средства технологического оснащения" FontWeight="Bold" Grid.Column="1">

@@ -15,9 +15,9 @@ namespace ATP_Lab.ViewModels
 {
     public class SettingViewModel : INotifyPropertyChanged
     {
-        TreeViewModel view = new TreeViewModel();
-        private bool canExecute = true;
+        private TreeViewModel view = new TreeViewModel();
 
+        #region Constructor
         public SettingViewModel()
         {
             SectionCollection = view.AllCollection;
@@ -27,9 +27,9 @@ namespace ATP_Lab.ViewModels
             ViewPopUp = new RelayCommand(OpenPopUp, param => this.canExecute);
             SaveCollectionListbox = new RelayCommand(SaveListCollection, param => this.canExecute);
         }
+        #endregion
 
-
-        #region
+        #region Collections
         private ObservableCollection<string> nameSectionContent = new ObservableCollection<string>();
         public ObservableCollection<string> NameSectionContent
         {
@@ -44,7 +44,9 @@ namespace ATP_Lab.ViewModels
         public ObservableCollection<string> OperationNameCollection
         {
             get { return operationNameCollection; }
-            set { operationNameCollection = value;
+            set
+            {
+                operationNameCollection = value;
                 OnPropertyChanged("OperationNameCollection");
             }
         }
@@ -123,11 +125,14 @@ namespace ATP_Lab.ViewModels
         }
         #endregion
 
+        #region Properties
+        private bool canExecute = true;
         private int selectedIndex = 0;
         public int SelectedIndex
         {
             get { return selectedIndex; }
-            set {
+            set
+            {
                 selectedIndex = value;
                 SetCollection();
             }
@@ -143,11 +148,11 @@ namespace ATP_Lab.ViewModels
             }
         }
         private bool popUp = false;
-
         public bool PopUp
         {
             get { return popUp; }
-            set {
+            set
+            {
                 popUp = value;
                 OnPropertyChanged("PopUp");
             }
@@ -157,7 +162,8 @@ namespace ATP_Lab.ViewModels
         public string SelectedItem
         {
             get { return selectedItem; }
-            set {
+            set
+            {
                 selectedItem = value;
                 OnPropertyChanged("SelectedItem");
             }
@@ -167,39 +173,55 @@ namespace ATP_Lab.ViewModels
         public string InputText
         {
             get { return inputText; }
-            set { inputText = value;
+            set
+            {
+                inputText = value;
                 OnPropertyChanged("InputText");
             }
         }
+        #endregion
 
-
+        #region Methods
+        /// <summary>
+        /// Show PopUp menu
+        /// </summary>
+        /// <param name="obj"></param>
         private void OpenPopUp(object obj)
         {
-            if (PopUp)
-            {
-                PopUp = false;
-            }
-            else
-            {
-                PopUp = true;
-            }
+            PopUp = PopUp == true ? false : true;
         }
 
+        /// <summary>
+        /// Correct SelectedItem
+        /// </summary>
+        /// <param name="obj"></param>
         private void CorrectItem(object obj)
         {
-           OperationNameCollection[ListBoxSelectedIndex] = InputText;
+            OperationNameCollection[ListBoxSelectedIndex] = InputText;
         }
 
+        /// <summary>
+        /// Add new Item
+        /// </summary>
+        /// <param name="obj"></param>
         private void AddItem(object obj)
         {
-           OperationNameCollection.Add(InputText);
+            OperationNameCollection.Add(InputText);
         }
 
+        /// <summary>
+        /// Delete Item
+        /// </summary>
+        /// <param name="obj"></param>
         private void DeleteItem(object obj)
         {
             OperationNameCollection.Remove(SelectedItem);
         }
 
+        /// <summary>
+        /// Save of the collection to a file
+        /// </summary>
+        /// <param name="obj"></param>
         private void SaveListCollection(object obj)
         {
             string json = JsonConvert.SerializeObject(OperationNameCollection);
@@ -207,6 +229,9 @@ namespace ATP_Lab.ViewModels
             System.IO.File.WriteAllText(Name + ".txt", json);
         }
 
+        /// <summary>
+        /// Collections reading from a file
+        /// </summary>
         private void SetCollection()
         {
             OperationNameCollection = new ObservableCollection<string>(ReturnCollectionOutFile());
@@ -222,6 +247,7 @@ namespace ATP_Lab.ViewModels
             }
             return JsonConvert.DeserializeObject<ObservableCollection<string>>(text);
         }
+        #endregion
 
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnPropertyChanged(string Property)

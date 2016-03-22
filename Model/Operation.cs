@@ -29,12 +29,6 @@ namespace ATP_Lab.Model
             set;
         }
 
-        public Operation Parent
-        {
-            get;
-            set;
-        }
-
         public ObservableCollection<Operation> MoreOperation
         {
             get
@@ -42,29 +36,14 @@ namespace ATP_Lab.Model
                 if (operationContent == null)
                 {
                     operationContent = new ObservableCollection<Operation>();
-                    operationContent.CollectionChanged += new NotifyCollectionChangedEventHandler(OnMoreStuffChanged);
+                  
                 }
 
                 return operationContent;
             }
         }
 
-        private void OnMoreStuffChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (e.Action == NotifyCollectionChangedAction.Add)
-            {
-                Operation operation = (Operation)e.NewItems[0];
-                operation.Parent = this;
-            }
-            else if (e.Action == NotifyCollectionChangedAction.Remove)
-            {
-                Operation operation = (Operation)e.OldItems[0];
-                if (operation.Parent == this)
-                {
-                    operation.Parent = null;
-                }
-            }
-        }
+        
 
         
     }
