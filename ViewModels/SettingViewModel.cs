@@ -216,6 +216,7 @@ namespace ATP_Lab.ViewModels
         private void DeleteItem(object obj)
         {
             OperationNameCollection.Remove(SelectedItem);
+            SaveListCollection(null);
         }
 
         /// <summary>

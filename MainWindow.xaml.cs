@@ -23,21 +23,29 @@ namespace ATP_Lab
     /// </summary>
     public partial class MainWindow : Window
     {
-        private TreeViewModel treeViewModel;
+        SettingPage settingWindow = new SettingPage();
+        private TreeViewModel treeViewModel = new TreeViewModel();
         private ListView dragSource = null;
         private ListView parent = null;
         private Operation childData = null;
         private object firstObjectData = null;
         private object secondObjectData = null;
+        private int IndexItem = 0;
 
 
         public MainWindow()
         {
             InitializeComponent();
-            treeViewModel = new TreeViewModel();
             this.DataContext = treeViewModel;
+            settingWindow.Closing += SettingWindow_Closing;
         }
 
+        private void SettingWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            e.Cancel = true;
+            treeViewModel.SetCollection();
+            settingWindow.Hide();
+        }
 
         private void dList_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -63,18 +71,32 @@ namespace ATP_Lab
             //main listview
             if (parent.Name == "TestList")
             {
-                treeViewModel.Operation.Remove((Operation)firstObjectData);
-                treeViewModel.Operation.Insert(GetIndex(data, treeViewModel.Operation), (Operation)firstObjectData);
+                treeViewModel.Operations.Remove((Operation)firstObjectData);
+                treeViewModel.Operations.Insert(GetIndex(data, treeViewModel.Operations), (Operation)firstObjectData);
             }
             //expander listview
             else if (parent.Name == "dList")
             {
-                var operation = (Operation)firstObjectData;
-                foreach (var item in treeViewModel.Operation)
+                int ind = 0;
+                foreach (var item in treeViewModel.Operations)
                 {
                     if (item.Name == parent.Tag.ToString())
                     {
-                        item.MoreOperation.Add(new Operation(operation.Name));
+                        break;
+                    }
+                    else
+                    {
+                        ind++;
+                    }
+
+                }
+                var s = GetIndex(data, treeViewModel.Operations[ind].MoreOperation);
+                var operation = (Operation)firstObjectData;
+                foreach (var item in treeViewModel.Operations)
+                {
+                    if (item.Name == parent.Tag.ToString())
+                    {
+                        item.MoreOperation.Insert(s, new Operation(operation.Name));
                     }
                     if (item.Name == childData.Name.ToString())
                     {
@@ -133,6 +155,47 @@ namespace ATP_Lab
                     DragDrop.DoDragDrop(parent, secondObjectData, DragDropEffects.Move);
                 }
             }
+        }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            settingWindow.Show();
+        }
+
+        private void MenuItem_Click_1(object sender, RoutedEventArgs e)
+        {
+
+            EditChildData.IsOpen = EditChildData.IsOpen == true ? false : true;
+
+        }
+
+        private void DeleteChildItem_Click(object sender, RoutedEventArgs e)
+        {
+            treeViewModel.Operations[TestList.SelectedIndex].MoreOperation.RemoveAt(IndexItem);
+        }
+
+        private void EditChildItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (!EditChildData.IsOpen)
+            {
+                EditChildData.IsOpen = true;
+                EditTextPopUp.Text = treeViewModel.Operations[TestList.SelectedIndex].MoreOperation[IndexItem].Name;
+            }
+            else
+            {
+                EditChildData.IsOpen = false;
+            }
+        }
+
+        private void dList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ListView parent = (ListView)sender;
+            IndexItem = parent.SelectedIndex;
+        }
+
+        private void SaveEditItem_Click(object sender, RoutedEventArgs e)
+        {
+            treeViewModel.Operations[TestList.SelectedIndex].MoreOperation[IndexItem].Name = EditTextPopUp.Text;
         }
     }
 }

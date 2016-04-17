@@ -26,6 +26,7 @@ namespace ATP_Lab.ViewModels
             IransitionCommand = new RelayCommand(ItransitionGenerate, param => this.canExecute);
             OpenSettingCommand = new RelayCommand(OpenSettingWindow, param => this.canExecute);
             SaveMainCollection = new RelayCommand(SaveProgrammProgress, param => this.canExecute);
+            DeleteMainOperationCommand = new RelayCommand(DeleteMainOperation, param => this.canExecute);
 
             allCollection.Add(new AllCollectionModel("MainOperation", OperationNameCollection));
             allCollection.Add(new AllCollectionModel("Equipment", Equipment));
@@ -37,11 +38,14 @@ namespace ATP_Lab.ViewModels
             SetCollection();
             operationID = ReturnLastNumberOutFile(SettingFile);
             NewOperationCollection = ReturnCollectionOutFile<string>(NewCollection);
-            _Operation = ReturnCollectionOutFile<Operation>(ProgrammProgress);
+            Operations = ReturnCollectionOutFile<Operation>(ProgrammProgress);
             if (_Operation == null)
                 _Operation = new ObservableCollection<Model.Operation>();
         }
+
         #endregion
+
+        #region Methods
 
         /// <summary>
         /// Opent setting window
@@ -150,26 +154,26 @@ namespace ATP_Lab.ViewModels
         /// <summary>
         /// Set collection from files
         /// </summary>
-        private void SetCollection()
+        public void SetCollection()
         {
             foreach (var item in AllCollection)
             {
                 switch (item.Name)
                 {
                     case "Instrument":
-                        instrument = ReturnCollectionOutFile<string>(item.Name);
+                        Instrument = ReturnCollectionOutFile<string>(item.Name);
                         break;
                     case "Equipment":
-                        equipment = ReturnCollectionOutFile<string>(item.Name);
+                        Equipment = ReturnCollectionOutFile<string>(item.Name);
                         break;
                     case "Control":
-                        control = ReturnCollectionOutFile<string>(item.Name);
+                        Control = ReturnCollectionOutFile<string>(item.Name);
                         break;
                     case "Action":
-                        action = ReturnCollectionOutFile<string>(item.Name);
+                        Action = ReturnCollectionOutFile<string>(item.Name);
                         break;
                     case "ObjectAction":
-                        objectAction = ReturnCollectionOutFile<string>(item.Name);
+                        ObjectAction = ReturnCollectionOutFile<string>(item.Name);
                         break;
                 }
 
@@ -218,6 +222,12 @@ namespace ATP_Lab.ViewModels
             System.IO.File.WriteAllText(name + ".txt", content);
         }
 
+
+        private void DeleteMainOperation(object obj)
+        {
+            Operations.RemoveAt(MainOperationIndex);
+        }
+
         /// <summary>
         /// Add childe operation in collection
         /// </summary>
@@ -229,7 +239,7 @@ namespace ATP_Lab.ViewModels
         {
             if (acceptAdd)
             {
-                foreach (var item in _Operation)
+                foreach (var item in Operations)
                 {
                     if (item.Name == NewOperationCollection[index])
                     {
@@ -245,14 +255,7 @@ namespace ATP_Lab.ViewModels
 
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        public void OnPropertyChanged(string Property)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(Property));
-            }
-        }
+        #endregion
 
         #region Constants
         private const string ProgrammProgress = "Setting/ProgrammProgress";
@@ -265,7 +268,7 @@ namespace ATP_Lab.ViewModels
         #endregion
 
         #region Collections
-        private ObservableCollection<Operation> _Operation;
+        private ObservableCollection<Operation> _Operation = new ObservableCollection<Model.Operation>();
         private ObservableCollection<string> instrument;
         private ObservableCollection<string> equipment;
         private ObservableCollection<string> control;
@@ -301,12 +304,22 @@ namespace ATP_Lab.ViewModels
             {
                 return equipment;
             }
+            set
+            {
+                equipment = value;
+                OnPropertyChanged("Equipment");
+            }
         }
         public ObservableCollection<string> Control
         {
             get
             {
                 return control;
+            }
+            set
+            {
+                control = value;
+                OnPropertyChanged("Control");
             }
         }
         public ObservableCollection<string> Action
@@ -315,6 +328,11 @@ namespace ATP_Lab.ViewModels
             {
                 return action;
             }
+            set
+            {
+                action = value;
+                OnPropertyChanged("Action");
+            }
         }
         public ObservableCollection<string> ObjectAction
         {
@@ -322,12 +340,22 @@ namespace ATP_Lab.ViewModels
             {
                 return objectAction;
             }
+            set
+            {
+                objectAction = value;
+                OnPropertyChanged("ObjectAction");
+            }
         }
-        public ObservableCollection<Operation> Operation
+        public ObservableCollection<Operation> Operations
         {
             get
             {
                 return _Operation;
+            }
+            set
+            {
+                _Operation = value;
+                OnPropertyChanged("Operation");
             }
         }
         public ObservableCollection<string> NewOperationCollection
@@ -355,6 +383,7 @@ namespace ATP_Lab.ViewModels
         #region Properties
         private bool canExecute = true;
         private int operationID = 1;
+        public int NowSelectedIndex { get; set; } = 1;
         private string meansOfTechnologicalEquipment = "empty";
         public string MeansOfTechnologicalEquipment { get { return meansOfTechnologicalEquipment; } set { meansOfTechnologicalEquipment = value; OnPropertyChanged("MeansOfTechnologicalEquipment"); } }
         private string itransitionContent = "empty";
@@ -373,6 +402,10 @@ namespace ATP_Lab.ViewModels
         public string SizeThree { get { return sizeThree; } set { sizeThree = value; OnPropertyChanged("SizeThree"); } }
         private string sizeThreeValue = "0";
         public string SizeThreeValue { get { return sizeThreeValue; } set { sizeThreeValue = value; OnPropertyChanged("SizeThreeValue"); } }
+        private string editNameTextPopUp;
+        public string EditNameTextPopUp { get { return editNameTextPopUp; } set { editNameTextPopUp = value; OnPropertyChanged("EditNameTextPopUp"); } }
+
+
         private int selectedIndexInstrumentComboBox = 0;
         public int SelectedIndexInstrumentComboBox
         {
@@ -433,6 +466,27 @@ namespace ATP_Lab.ViewModels
                 OnPropertyChanged("SelectedMainOperationCombobox");
             }
         }
+        private int mainOperationIndex;
+        public int MainOperationIndex
+        {
+            get { return mainOperationIndex; }
+            set
+            {
+                NowSelectedIndex = value;
+                mainOperationIndex = value;
+                OnPropertyChanged("MainOperationIndex");
+            }
+        }
+        private int childOperationIndex;
+        public int ChildOperationIndex
+        {
+            get { return childOperationIndex; }
+            set
+            {
+                childOperationIndex = value;
+                OnPropertyChanged("ChildOperationIndex");
+            }
+        }
         private bool meansChoise = false;
         public bool MeansChoise
         {
@@ -451,6 +505,18 @@ namespace ATP_Lab.ViewModels
             {
                 transitionChoise = value;
                 OnPropertyChanged("TransitionChoise");
+            }
+        }
+
+
+        private bool openEditPopUpBool = false;
+        public bool OpenEditPopUpBool
+        {
+            get { return openEditPopUpBool; }
+            set
+            {
+                openEditPopUpBool = value;
+                OnPropertyChanged("OpenEditPopUpBool");
             }
         }
 
@@ -544,6 +610,54 @@ namespace ATP_Lab.ViewModels
                 saveMainCollection = value;
             }
         }
+
+        private ICommand deleteMainOperationCommand;
+        public ICommand DeleteMainOperationCommand
+        {
+            get
+            {
+                return deleteMainOperationCommand;
+            }
+            set
+            {
+                deleteMainOperationCommand = value;
+            }
+        }
+
+        private ICommand deleteChildOperationCommand;
+        public ICommand DeleteChildOperationCommand
+        {
+            get
+            {
+                return deleteChildOperationCommand;
+            }
+            set
+            {
+                deleteChildOperationCommand = value;
+            }
+        }
+
+        private ICommand openPopUpEditCommand;
+        public ICommand OpenPopUpEditCommand
+        {
+            get
+            {
+                return openPopUpEditCommand;
+            }
+            set
+            {
+                openPopUpEditCommand = value;
+            }
+        }
         #endregion
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void OnPropertyChanged(string Property)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(Property));
+            }
+        }
     }
 }
